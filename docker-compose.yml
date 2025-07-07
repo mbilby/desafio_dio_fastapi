@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:11-alpine
+    container_name: workout-db
+    command: ["postgres"]
+    environment:
+      POSTGRES_USER: workout
+      POSTGRES_PASSWORD: workout
+      POSTGRES_DB: workout
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workout"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app: 
+    build: .
+    container_name: desafio-dio
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    env_file:
+      - .env.docker
+    depends_on:
+        db:
+          condition: service_healthy    
+volumes:
+  db_data:
+      
